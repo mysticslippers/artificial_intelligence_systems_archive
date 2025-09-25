@@ -1,0 +1,2 @@
+# artificial_intelligence_systems_archive
+Архив по дисциплине Системы искусственного интеллекта
