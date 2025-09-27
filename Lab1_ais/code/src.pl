@@ -59,6 +59,12 @@ born(alexandr, 1975).
 born(anton, 1996).
 born(eduard, 2001).
 born(madlen, 2007).
+born(boris, 1942).
+born(yana, 1997).
+born(artem, 2020).
+born(ruslan, 1979).
+born(vika, 2017).
+born(diana, 2014).
 
 married(nikolay, tamara, 2005).
 married(georgiy, agafya, 1930).
