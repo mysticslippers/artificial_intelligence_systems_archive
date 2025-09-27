@@ -80,3 +80,14 @@ died(agafya, 2013).
 
 % Правила.
 % -------------------------------------------------------------------
+is_parent_of(Possible_parent, Possible_child) :- parent(Possible_parent, Possible_child).
+is_grandparent_of(Possible_grandparent, Possible_child) :- is_parent_of(Possible_grandparent, Possible_parent), is_parent_of(Possible_parent, Possible_child).
+is_not_direct_relation(Possible_parent, Possible_child) :- (\+ is_parent_of(Possible_parent, Possible_child)), (\+ is_parent_of(Possible_child, Possible_parent)).
+
+is_sibling_of(Possible_sibling1, Possible_sibling2) :- is_parent_of(Possible_parent, Possible_sibling1), is_parent_of(Possible_parent, Possible_sibling2), Possible_sibling1 \= Possible_sibling2.
+is_cousin_of(Possible_cousin1, Possible_cousin2) :- common_ancestor(_Possible_ancestor, Possible_cousin1, Possible_cousin2), is_not_direct_relation(Possible_cousin1, Possible_cousin2), Possible_cousin1 \= Possible_cousin2.
+
+ancestor(Possible_parent, Possible_child) :- is_parent_of(Possible_parent, Possible_child).
+ancestor(Possible_grandparent, Possible_child) :- is_parent_of(Possible_grandparent, Possible_parent), ancestor(Possible_parent, Possible_child).
+
+common_ancestor(Possible_ancestor, Possible_descendant1, Possible_descendant2) :- ancestor(Possible_ancestor, Possible_descendant1), ancestor(Possible_ancestor, Possible_descendant2), Possible_ancestor \= Possible_descendant1, Possible_ancestor \= Possible_descendant2, Possible_descendant1 \= Possible_descendant2.
