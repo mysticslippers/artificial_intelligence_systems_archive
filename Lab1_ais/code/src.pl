@@ -89,5 +89,9 @@ is_cousin_of(Possible_cousin1, Possible_cousin2) :- common_ancestor(_Possible_an
 
 ancestor(Possible_parent, Possible_child) :- is_parent_of(Possible_parent, Possible_child).
 ancestor(Possible_grandparent, Possible_child) :- is_parent_of(Possible_grandparent, Possible_parent), ancestor(Possible_parent, Possible_child).
-
 common_ancestor(Possible_ancestor, Possible_descendant1, Possible_descendant2) :- ancestor(Possible_ancestor, Possible_descendant1), ancestor(Possible_ancestor, Possible_descendant2), Possible_ancestor \= Possible_descendant1, Possible_ancestor \= Possible_descendant2, Possible_descendant1 \= Possible_descendant2.
+
+calculate_age(Person, Year, Age) :- born(Person, Birth_year), Year >= Birth_year, Age is Year - Birth_year.
+calculate_difference_in_age(Person1, Person2, Difference) :- born(Person1, Birth_year1), born(Person2, Birth_year2), Difference is abs(Birth_year1 - Birth_year2).
+
+is_couple_in_year(Possible_husband, Possible_wife, Year) :- married(Possible_husband, Possible_wife, Marriage_year), Year >= Marriage_year, \+ (divorced(Possible_husband, Possible_wife, Divorce_year), Divorce_year =< Year).
