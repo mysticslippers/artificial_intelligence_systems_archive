@@ -91,13 +91,24 @@ is_grandparent_of(Possible_grandparent, Possible_child) :- is_parent_of(Possible
 is_not_direct_relation(Possible_parent, Possible_child) :- (\+ is_parent_of(Possible_parent, Possible_child)), (\+ is_parent_of(Possible_child, Possible_parent)).
 
 is_sibling_of(Possible_sibling1, Possible_sibling2) :- is_parent_of(Possible_parent, Possible_sibling1), is_parent_of(Possible_parent, Possible_sibling2), Possible_sibling1 \= Possible_sibling2.
+collect_siblings(Person, Siblings) :- setof(Possible_sibling, Other^(is_sibling_of(Person, Possible_sibling), Other = Person), Siblings).
+count_siblings(Person, Count) :- collect_siblings(Person, Siblings), length(Siblings, Count).
+
 is_cousin_of(Possible_cousin1, Possible_cousin2) :- common_ancestor(_Possible_ancestor, Possible_cousin1, Possible_cousin2), is_not_direct_relation(Possible_cousin1, Possible_cousin2), Possible_cousin1 \= Possible_cousin2.
+collect_cousins(Person, Cousins) :- setof(Possible_cousin, Other^(is_cousin_of(Person, Possible_cousin), Other = Person), Cousins).
+count_cousins(Person, Count) :- collect_cousins(Person, Cousins), length(Cousins, Count).
 
 ancestor(Possible_parent, Possible_child) :- is_parent_of(Possible_parent, Possible_child).
 ancestor(Possible_grandparent, Possible_child) :- is_parent_of(Possible_grandparent, Possible_parent), ancestor(Possible_parent, Possible_child).
 common_ancestor(Possible_ancestor, Possible_descendant1, Possible_descendant2) :- ancestor(Possible_ancestor, Possible_descendant1), ancestor(Possible_ancestor, Possible_descendant2), Possible_ancestor \= Possible_descendant1, Possible_ancestor \= Possible_descendant2, Possible_descendant1 \= Possible_descendant2.
 
 calculate_age(Person, Year, Age) :- born(Person, Birth_year), Year >= Birth_year, Age is Year - Birth_year.
+calculate_ages(Year, Ages) :- findall(Age, (born(Person, _BirthYear), calculate_age(Person, Year, Age)), Ages).
+calculate_average_age(Year, Average_age) :- calculate_ages(Year, Ages), sum_list(Ages, Sum), length(Ages, Len), Len > 0, Average_age is Sum / Len.
 calculate_difference_in_age(Person1, Person2, Difference) :- born(Person1, Birth_year1), born(Person2, Birth_year2), Difference is abs(Birth_year1 - Birth_year2).
 
 is_couple_in_year(Possible_husband, Possible_wife, Year) :- married(Possible_husband, Possible_wife, Marriage_year), Year >= Marriage_year, \+ (divorced(Possible_husband, Possible_wife, Divorce_year), Divorce_year =< Year).
+calculate_marriage_duration(Possible_husband, Possible_wife, Duration) :- married(Possible_husband, Possible_wife, Marriage_year), divorced(Possible_husband, Possible_wife, Divorce_year), Duration is Divorce_year - Marriage_year.
+
+count_born_in_year(Year, Count) :- findall(Person, born(Person, Year), List), length(List, Count).
+find_year_counts(Year_counts) :- setof(Year, Person^born(Person, Year), Years), findall(Year-Count, (member(Year, Years), findall(Possible_person, born(Possible_person, Year), Persons), length(Persons, Count)), Year_counts).
