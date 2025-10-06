@@ -1,0 +1,339 @@
+<?xml version="1.0"?>
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <Prefix name="" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="ex" IRI="http://example.org/ontology#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xml" IRI="http://www.w3.org/XML/1998/namespace"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <Class abbreviatedIRI="ex:Person"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty abbreviatedIRI="ex:isParentOf"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Agafya"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Alexander"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Andrew"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Angelina"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Artem"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Boris"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Denis"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Dmitriy"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Galina"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Georgiy"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Larisa"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Ludmila"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Mama"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Nikolay"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Ruslan"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Tamara"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Tatiana"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Vladimir"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Vyacheslav"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Yana"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Madlen"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Anton"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual abbreviatedIRI="ex:Eduard"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <Class abbreviatedIRI="ex:Person"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <Class abbreviatedIRI="ex:Person"/>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Agafya"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Alexander"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Andrew"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Angelina"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Anton"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Artem"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Boris"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Denis"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Dmitriy"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Eduard"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Galina"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Georgiy"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Larisa"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Ludmila"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Madlen"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Mama"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Nikolay"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Ruslan"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Tamara"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Tatiana"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Vladimir"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Male"/>
+        <NamedIndividual abbreviatedIRI="ex:Vyacheslav"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="http://www.co-ode.org/ontologies/ont.owl#Female"/>
+        <NamedIndividual abbreviatedIRI="ex:Yana"/>
+    </ClassAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Agafya"/>
+        <NamedIndividual abbreviatedIRI="ex:Galina"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Agafya"/>
+        <NamedIndividual abbreviatedIRI="ex:Tatiana"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Agafya"/>
+        <NamedIndividual abbreviatedIRI="ex:Vladimir"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Alexander"/>
+        <NamedIndividual abbreviatedIRI="ex:Artem"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Alexander"/>
+        <NamedIndividual abbreviatedIRI="ex:Eduard"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Alexander"/>
+        <NamedIndividual abbreviatedIRI="ex:Madlen"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Andrew"/>
+        <NamedIndividual abbreviatedIRI="ex:Dmitriy"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Anton"/>
+        <NamedIndividual abbreviatedIRI="ex:Artem"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Boris"/>
+        <NamedIndividual abbreviatedIRI="ex:Mama"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Galina"/>
+        <NamedIndividual abbreviatedIRI="ex:Mama"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Georgiy"/>
+        <NamedIndividual abbreviatedIRI="ex:Galina"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Georgiy"/>
+        <NamedIndividual abbreviatedIRI="ex:Tatiana"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Georgiy"/>
+        <NamedIndividual abbreviatedIRI="ex:Vladimir"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Larisa"/>
+        <NamedIndividual abbreviatedIRI="ex:Angelina"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Larisa"/>
+        <NamedIndividual abbreviatedIRI="ex:Denis"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Ludmila"/>
+        <NamedIndividual abbreviatedIRI="ex:Artem"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Ludmila"/>
+        <NamedIndividual abbreviatedIRI="ex:Eduard"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Ludmila"/>
+        <NamedIndividual abbreviatedIRI="ex:Madlen"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Mama"/>
+        <NamedIndividual abbreviatedIRI="ex:Dmitriy"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Nikolay"/>
+        <NamedIndividual abbreviatedIRI="ex:Larisa"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Tamara"/>
+        <NamedIndividual abbreviatedIRI="ex:Andrew"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Tamara"/>
+        <NamedIndividual abbreviatedIRI="ex:Larisa"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Tatiana"/>
+        <NamedIndividual abbreviatedIRI="ex:Ludmila"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Tatiana"/>
+        <NamedIndividual abbreviatedIRI="ex:Ruslan"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Vyacheslav"/>
+        <NamedIndividual abbreviatedIRI="ex:Ludmila"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Vyacheslav"/>
+        <NamedIndividual abbreviatedIRI="ex:Ruslan"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
+        <ObjectProperty abbreviatedIRI="ex:hasParent"/>
+        <NamedIndividual abbreviatedIRI="ex:Yana"/>
+        <NamedIndividual abbreviatedIRI="ex:Artem"/>
+    </ObjectPropertyAssertion>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
+
