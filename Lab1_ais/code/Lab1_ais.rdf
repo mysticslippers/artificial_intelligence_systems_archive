@@ -388,14 +388,53 @@
     
 
 
+    <!-- http://ontologies/movies.owl#BackToTheFuture -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#BackToTheFuture">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Movie"/>
+        <movies:hasGenreIn rdf:resource="http://ontologies/movies.owl#Comedy"/>
+        <movies:hasGenreIn rdf:resource="http://ontologies/movies.owl#Fantasy"/>
+        <movies:hasAgeLimit rdf:datatype="http://www.w3.org/2001/XMLSchema#unsignedShort">12</movies:hasAgeLimit>
+        <movies:hasCountry>USA</movies:hasCountry>
+        <movies:hasRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float">8.6</movies:hasRating>
+        <movies:hasReleaseYear rdf:datatype="http://www.w3.org/2001/XMLSchema#unsignedInt">1985</movies:hasReleaseYear>
+        <movies:hasTitle>Back to the Future</movies:hasTitle>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontologies/movies.owl#Biographical -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#Biographical">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Genre"/>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://ontologies/movies.owl#ChristopherNolan -->
 
     <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#ChristopherNolan">
         <rdf:type rdf:resource="http://ontologies/movies.owl#Director"/>
+        <movies:hasDirectedIn rdf:resource="http://ontologies/movies.owl#Oppenheimer"/>
         <movies:hasAge rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">55</movies:hasAge>
         <movies:hasBirthDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1970-07-30</movies:hasBirthDate>
         <movies:hasGender rdf:datatype="http://ontologies/movies.owl#GenderValue">Male</movies:hasGender>
         <movies:hasName>Christopher</movies:hasName>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontologies/movies.owl#CillianMurphy -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#CillianMurphy">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Actor"/>
+        <movies:hasActedIn rdf:resource="http://ontologies/movies.owl#Oppenheimer"/>
+        <movies:hasRoleIn rdf:resource="http://ontologies/movies.owl#RobertOppenheimer"/>
+        <movies:hasAge rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">49</movies:hasAge>
+        <movies:hasBirthDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1976-05-25</movies:hasBirthDate>
+        <movies:hasGender rdf:datatype="http://ontologies/movies.owl#GenderValue">Male</movies:hasGender>
+        <movies:hasName>Cillian</movies:hasName>
+        <movies:hasStageName>Oppenheimer</movies:hasStageName>
     </owl:NamedIndividual>
     
 
@@ -446,7 +485,7 @@
         <movies:hasGenreIn rdf:resource="http://ontologies/movies.owl#Action"/>
         <movies:hasGenreIn rdf:resource="http://ontologies/movies.owl#Adventure"/>
         <movies:hasGenreIn rdf:resource="http://ontologies/movies.owl#Fantasy"/>
-        <movies:hasAgeLimit rdf:datatype="http://www.w3.org/2001/XMLSchema#unsignedShort">18</movies:hasAgeLimit>
+        <movies:hasAgeLimit rdf:datatype="http://www.w3.org/2001/XMLSchema#unsignedShort">16</movies:hasAgeLimit>
         <movies:hasCountry>USA</movies:hasCountry>
         <movies:hasRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float">9.6</movies:hasRating>
         <movies:hasReleaseYear rdf:datatype="http://www.w3.org/2001/XMLSchema#unsignedInt">2001</movies:hasReleaseYear>
@@ -510,11 +549,50 @@
     
 
 
+    <!-- http://ontologies/movies.owl#MartinMcFly -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#MartinMcFly">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Role"/>
+        <movies:hasRoleInMovie rdf:resource="http://ontologies/movies.owl#BackToTheFuture"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontologies/movies.owl#MichaelFox -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#MichaelFox">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Actor"/>
+        <movies:hasActedIn rdf:resource="http://ontologies/movies.owl#BackToTheFuture"/>
+        <movies:hasRoleIn rdf:resource="http://ontologies/movies.owl#MartinMcFly"/>
+        <movies:hasAge rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">64</movies:hasAge>
+        <movies:hasBirthDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1961-06-09</movies:hasBirthDate>
+        <movies:hasGender rdf:datatype="http://ontologies/movies.owl#GenderValue">Male</movies:hasGender>
+        <movies:hasName>Michael</movies:hasName>
+        <movies:hasStageName>McFly</movies:hasStageName>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://ontologies/movies.owl#NewLineCinema -->
 
     <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#NewLineCinema">
         <rdf:type rdf:resource="http://ontologies/movies.owl#ProductionCompany"/>
         <movies:hasProducedIn rdf:resource="http://ontologies/movies.owl#FellowshipOfTheRing"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontologies/movies.owl#Oppenheimer -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#Oppenheimer">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Movie"/>
+        <movies:hasGenreIn rdf:resource="http://ontologies/movies.owl#Biographical"/>
+        <movies:hasGenreIn rdf:resource="http://ontologies/movies.owl#Thriller"/>
+        <movies:hasAgeLimit rdf:datatype="http://www.w3.org/2001/XMLSchema#unsignedShort">18</movies:hasAgeLimit>
+        <movies:hasCountry>UK</movies:hasCountry>
+        <movies:hasRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float">8.1</movies:hasRating>
+        <movies:hasReleaseYear rdf:datatype="http://www.w3.org/2001/XMLSchema#unsignedInt">2023</movies:hasReleaseYear>
+        <movies:hasTitle>Oppenheimer</movies:hasTitle>
     </owl:NamedIndividual>
     
 
@@ -547,6 +625,28 @@
     
 
 
+    <!-- http://ontologies/movies.owl#RobertOppenheimer -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#RobertOppenheimer">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Role"/>
+        <movies:hasRoleInMovie rdf:resource="http://ontologies/movies.owl#Oppenheimer"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://ontologies/movies.owl#RobertZemeckis -->
+
+    <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#RobertZemeckis">
+        <rdf:type rdf:resource="http://ontologies/movies.owl#Director"/>
+        <movies:hasDirectedIn rdf:resource="http://ontologies/movies.owl#BackToTheFuture"/>
+        <movies:hasAge rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">73</movies:hasAge>
+        <movies:hasBirthDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1952-05-14</movies:hasBirthDate>
+        <movies:hasGender rdf:datatype="http://ontologies/movies.owl#GenderValue">Male</movies:hasGender>
+        <movies:hasName>Robert</movies:hasName>
+    </owl:NamedIndividual>
+    
+
+
     <!-- http://ontologies/movies.owl#Romance -->
 
     <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#Romance">
@@ -567,6 +667,7 @@
 
     <owl:NamedIndividual rdf:about="http://ontologies/movies.owl#UniversalPictures">
         <rdf:type rdf:resource="http://ontologies/movies.owl#ProductionCompany"/>
+        <movies:hasProducedIn rdf:resource="http://ontologies/movies.owl#BackToTheFuture"/>
     </owl:NamedIndividual>
     
 
