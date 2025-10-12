@@ -32,7 +32,21 @@ class UserInputManager:
     def _normalize_title(self, s: str) -> str:
         return s.strip()
 
+    def clear(self) -> None:
+        self.age = None
+        self.genres = None
+        self.country = None
+        self.rating = None
+        self.release_year = None
+        self.title = None
+        self.director = None
+        self.actor = None
+        self.production_company = None
+
+
     def parse(self, input_text: str) -> None:
+        self.clear()
+
         if not input_text or not isinstance(input_text, str):
             raise ValueError("input_text должен быть непустой строкой")
 
