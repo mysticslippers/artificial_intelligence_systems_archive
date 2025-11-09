@@ -98,7 +98,7 @@ def split_dataset(df: pd.DataFrame, target_column: str, test_size: float = 0.2, 
 
 
 def linear_regression(X: np.ndarray, y: np.ndarray, learning_rate: float = 0.5,
-                      n_steps: int = 1500, verbose: bool = True) -> tuple[np.ndarray, float]:
+                      n_steps: int = 1500) -> tuple[np.ndarray, float]:
 
     if isinstance(X, pd.DataFrame):
         X = X.values
@@ -118,10 +118,6 @@ def linear_regression(X: np.ndarray, y: np.ndarray, learning_rate: float = 0.5,
 
         weights -= learning_rate * dw
         bias -= learning_rate * db
-
-        if verbose and (step % 200 == 0 or step == n_steps - 1):
-            mse = np.mean(error ** 2)
-            print(f"Итерация {step:4d} | MSE: {mse:.6f}")
 
     return weights, bias
 
@@ -179,7 +175,7 @@ def build_model_with_synthetic_feature(X_train, X_test, y_train, y_test):
 
     print("Добавлен признак 'income_per_household' (median_income * households)")
 
-    model = linear_regression(X_train_syn.values, y_train.values, learning_rate=0.01, n_steps=1500, verbose=False)
+    model = linear_regression(X_train_syn.values, y_train.values, learning_rate=0.5, n_steps=1500)
 
     y_pred = np.dot(X_test_syn.values, model[0]) + model[1]
 
@@ -219,7 +215,7 @@ def tune_hyperparameters(X_train, X_test, y_train, y_test, feature_sets: dict):
             for steps in step_counts:
                 weights, bias = linear_regression(
                     X_train[features].values, y_train.values,
-                    learning_rate=lr, n_steps=steps, verbose=False
+                    learning_rate=lr, n_steps=steps
                 )
 
                 y_pred = np.dot(X_test[features].values, weights) + bias
@@ -294,10 +290,14 @@ def main(path: str = "california_housing_train.csv"):
 
     print("\n=== Поиск оптимальных гиперпараметров ===")
 
+    X_train["income_per_household"] = X_train["median_income"] * X_train["households"]
+    X_test["income_per_household"] = X_test["median_income"] * X_test["households"]
+
     feature_sets = {
-        "Модель 1 (все признаки)": list(X_train.columns),
+        "Модель 1 (все признаки)": [col for col in X_train.columns if col != "income_per_household"],
         "Модель 2 (географические признаки)": ['longitude', 'latitude'],
-        "Модель 3 (соц.-экономические признаки)": ['median_income', 'total_rooms', 'population', 'households']
+        "Модель 3 (соц.-экономические признаки)": ['median_income', 'total_rooms', 'population', 'households'],
+        "Модель 4 (с синтетическим признаком)": list(X_train.columns)
     }
 
     tune_hyperparameters(X_train, X_test, y_train, y_test, feature_sets)
