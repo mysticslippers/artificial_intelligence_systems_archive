@@ -54,10 +54,8 @@ def plot_basic_stats(df: pd.DataFrame, figsize: Tuple[int, int] = (15, 10)) -> N
     plt.show()
 
 
-def preprocess_dataset(df: pd.DataFrame, numerical_features: list,
-                       categorical_features: list = None, target_column: str = None) -> pd.DataFrame:
+def preprocess_dataset(df: pd.DataFrame, numerical_features: list, target_column: str = None) -> pd.DataFrame:
     df = df.copy()
-    categorical_features = categorical_features or []
 
     print("Удаление строк с отсутствующими значениями...")
     df = df.dropna().reset_index(drop=True)
@@ -70,9 +68,6 @@ def preprocess_dataset(df: pd.DataFrame, numerical_features: list,
     df_scaled = df.copy()
     df_scaled[features_to_scale] = scaler.fit_transform(df_scaled[features_to_scale])
 
-    if categorical_features:
-        print("Кодирование категориальных признаков...")
-        df_scaled = pd.get_dummies(df_scaled, columns=categorical_features, drop_first=True)
 
     return df_scaled
 
@@ -270,10 +265,9 @@ def main(path: str = "california_housing_train.csv"):
         'total_rooms', 'total_bedrooms', 'population',
         'households', 'median_income'
     ]
-    categorical_characteristics = []
     target_column = 'median_house_value'
 
-    preprocessed_df = preprocess_dataset(df, numerical_characteristics, categorical_characteristics, target_column)
+    preprocessed_df = preprocess_dataset(df, numerical_characteristics, target_column)
     print(preprocessed_df.head())
 
     print("\n=== Разделение данных на обучающую и тестовую выборки ===")
