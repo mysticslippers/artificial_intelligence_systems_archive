@@ -115,6 +115,60 @@ class DecisionTreeNode:
         return "\n".join(lines)
 
 
+class InformationEntropy:
+    def __init__(self, df: pd.DataFrame, y_label: str):
+        self.y_label = y_label
+        self.y_classes = set(df[y_label].unique())
+
+        self.X_values: Dict[str, set] = {}
+        for col in df.columns:
+            if col != y_label:
+                self.X_values[col] = set(df[col].unique())
+
+    def info(self, df: pd.DataFrame) -> float:
+        n = df.shape[0]
+        if n == 0:
+            return 0.0
+
+        counts = df[self.y_label].value_counts()
+        probs = counts / n
+        return float(-(probs * np.log2(probs)).sum())
+
+    def info_X(self, df: pd.DataFrame, X_label: str) -> float:
+        n = df.shape[0]
+        if n == 0:
+            return 0.0
+
+        result = 0.0
+        for attr in self.X_values[X_label]:
+            df_i = df.loc[df[X_label] == attr]
+            if df_i.shape[0] == 0:
+                continue
+            result += df_i.shape[0] * self.info(df_i)
+
+        return result / n
+
+    def split_info_X(self, df: pd.DataFrame, X_label: str) -> float:
+        n = df.shape[0]
+        if n == 0:
+            return 1e-9
+
+        result = 0.0
+        for attr in self.X_values[X_label]:
+            df_i = df.loc[df[X_label] == attr]
+            if df_i.shape[0] == 0:
+                continue
+            p = df_i.shape[0] / n
+            result -= p * np.log2(p)
+
+        return result if result > 0 else 1e-9
+
+    def gain_ratio_X(self, df: pd.DataFrame, X_label: str, info_df: Optional[float] = None) -> float:
+        if info_df is None:
+            info_df = self.info(df)
+        return (info_df - self.info_X(df, X_label)) / self.split_info_X(df, X_label)
+
+
 def main(path: str = "AgaricusLepiota.csv") -> None:
     try:
         data = load_data(path)
