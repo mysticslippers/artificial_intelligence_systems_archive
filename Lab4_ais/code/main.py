@@ -259,3 +259,60 @@ def build_and_evaluate_two_knn_models(data: pd.DataFrame, target_col: str, fixed
         "random": confusion_random,
         "fixed": confusion_fixed
     }
+
+
+def main(path: str = "WineDataset.csv") -> None:
+    try:
+        data = load_data(path)
+    except FileNotFoundError:
+        print(f"Файл '{path}' не найден. Проверь путь к датасету.")
+        return
+
+    print("Первые строки датасета:")
+    print(data.head(), "\n")
+
+    print("Статистика по датасету:")
+    stats = dataset_statistics(data)
+    pd.set_option("display.max_columns", None)
+    print(stats, "\n")
+
+    visualize_dataset_statistics(data, target_col="Wine", random_state=42)
+
+    X_scaled, y = preprocess_data(data, target_col="Wine")
+    scaled_data = pd.concat([X_scaled, y], axis=1)
+
+    fixed_features = ["Alcohol", "Malic Acid", "Ash"]
+    print("Исходный фиксированный набор признаков для Модели 2:", fixed_features)
+
+    k_values = [1, 3, 5, 7, 10]
+
+    results = build_and_evaluate_two_knn_models(
+        data=scaled_data,
+        target_col="Wine",
+        fixed_features=fixed_features,
+        k_values=k_values,
+        random_state=42
+    )
+
+    def accuracy_from_confusion(cm: np.ndarray) -> float:
+        correct = np.trace(cm)
+        total = cm.sum()
+        return correct / total if total > 0 else 0.0
+
+    print("\n=== Матрицы ошибок: Модель 1 (случайные признаки) ===")
+    for k, cm in zip(k_values, results["random"]):
+        acc = accuracy_from_confusion(cm)
+        print(f"\nk = {k}, accuracy = {acc:.3f}")
+        print(cm)
+
+    print("\n=== Матрицы ошибок: Модель 2 (фиксированные признаки) ===")
+    print("Фактически использованные фиксированные признаки:",
+          [col for col in scaled_data.columns if col != "Wine"][:len(fixed_features)])
+    for k, cm in zip(k_values, results["fixed"]):
+        acc = accuracy_from_confusion(cm)
+        print(f"\nk = {k}, accuracy = {acc:.3f}")
+        print(cm)
+
+
+if __name__ == "__main__":
+    main()
