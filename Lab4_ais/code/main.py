@@ -33,3 +33,122 @@ def preprocess_data(data: pd.DataFrame, target_col: str = "Wine") -> Tuple[pd.Da
     )
 
     return X_scaled, y
+
+
+def visualize_dataset_statistics(data: pd.DataFrame, target_col: str = "Wine", random_state: Optional[int] = 42) -> None:
+    rows_count, _ = data.shape
+
+    numeric_cols = data.select_dtypes(include=[np.number]).columns
+    if len(numeric_cols) == 0:
+        print("Нет числовых признаков для построения гистограмм.")
+        return
+
+    means = data[numeric_cols].mean()
+    stds = data[numeric_cols].std()
+
+    bins_count = max(5, 1 + int(math.log(rows_count, 2)))
+    n_features = len(numeric_cols)
+    n_cols_subplot = 4
+    n_rows_subplot = math.ceil(n_features / n_cols_subplot)
+
+    fig, axes = plt.subplots(
+        n_rows_subplot,
+        n_cols_subplot,
+        figsize=(4 * n_cols_subplot, 3 * n_rows_subplot)
+    )
+    axes = axes.ravel()
+
+    for i, col in enumerate(numeric_cols):
+        ax = axes[i]
+        hist = ax.hist(
+            data[col],
+            bins=bins_count,
+            edgecolor="black"
+        )
+
+        max_height = np.max(hist[0])
+        mu = means[col]
+        sigma = stds[col]
+
+        ax.plot([mu, mu], [0, max_height], color="red", label="mean")
+        ax.plot([mu - sigma, mu - sigma], [0, max_height], color="yellow", label="-1σ")
+        ax.plot([mu + sigma, mu + sigma], [0, max_height], color="yellow", label="+1σ")
+
+        ax.set_title(col, fontsize=10)
+
+    for j in range(i + 1, len(axes)):
+        axes[j].axis("off")
+
+    fig.suptitle("Распределение признаков", fontsize=14)
+    fig.tight_layout()
+    plt.show()
+
+    X = data.drop(columns=[target_col])
+    y = data[target_col]
+
+    X_norm = (X - X.mean()) / (X.max() - X.min())
+
+    unique_classes = sorted(y.unique())
+    base_colors = ["red", "green", "blue", "orange", "purple", "brown"]
+    class_to_color = {
+        cls: base_colors[i % len(base_colors)]
+        for i, cls in enumerate(unique_classes)
+    }
+
+    if random_state is not None:
+        np.random.seed(random_state)
+
+    feature_names = list(X_norm.columns)
+    if len(feature_names) < 3:
+        print("Недостаточно признаков для 3D-визуализации.")
+        return
+
+    chosen_features = np.random.choice(feature_names, size=3, replace=False)
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111, projection="3d")
+
+    for cls in unique_classes:
+        values = X_norm[y == cls]
+        ax.scatter(
+            values[chosen_features[0]],
+            values[chosen_features[1]],
+            values[chosen_features[2]],
+            label=f"Класс {cls}",
+            color=class_to_color[cls]
+        )
+
+    ax.set_xlabel(chosen_features[0])
+    ax.set_ylabel(chosen_features[1])
+    ax.set_zlabel(chosen_features[2])
+    ax.set_title("3D-визуализация случайных нормализованных признаков")
+    ax.legend()
+    plt.show()
+
+    pca = PCA(n_components=3)
+    X_pca = pca.fit_transform(X_norm)
+
+    df_pca = pd.DataFrame(X_pca, columns=["pca1", "pca2", "pca3"])
+    df_pca[target_col] = y.values
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111, projection="3d")
+
+    for cls in unique_classes:
+        values = df_pca[df_pca[target_col] == cls]
+        ax.scatter(
+            values["pca1"],
+            values["pca2"],
+            values["pca3"],
+            label=f"Класс {cls}",
+            color=class_to_color[cls]
+        )
+
+    ax.set_xlabel("PCA 1")
+    ax.set_ylabel("PCA 2")
+    ax.set_zlabel("PCA 3")
+    ax.set_title("3D-визуализация первых трёх главных компонент (PCA)")
+    ax.legend()
+    ax.view_init(elev=-140, azim=60)
+
+    plt.show()
