@@ -38,6 +38,83 @@ def fill_missing_with_mode(data: pd.DataFrame, feature_names: List[str], missing
     return data
 
 
+@dataclass
+class DecisionTreeNode:
+    parent_attribute: Optional[str] = None
+    parent_attribute_value: Optional[Any] = None
+
+    attribute: Optional[str] = None
+    entropy: float = 0.0
+    samples_count: int = 0
+
+    samples: Dict[Any, int] = field(default_factory=dict)
+    probability: Dict[Any, float] = field(default_factory=dict)
+    prediction: Optional[Any] = None
+
+    children: List["DecisionTreeNode"] = field(default_factory=list)
+
+    def predict(self, x: pd.Series) -> Any:
+        if not self.children or self.attribute is None:
+            return self.prediction
+
+        value = x[self.attribute]
+        for child in self.children:
+            if child.parent_attribute_value == value:
+                return child.predict(x)
+
+        return self.prediction
+
+    def predict_proba(self, x: pd.Series) -> Dict[Any, float]:
+        if not self.children or self.attribute is None:
+            return self.probability
+
+        value = x[self.attribute]
+        for child in self.children:
+            if child.parent_attribute_value == value:
+                return child.predict_proba(x)
+
+        return self.probability
+
+    def __str__(self) -> str:
+        if not self.probability:
+            return "<Empty node>"
+
+        key_row, count_row, prob_row = "", "", ""
+        for key in sorted(self.probability):
+            key_str = str(key)
+            count_str = f"{self.samples[key]}"
+            prob_str = f"{self.probability[key]:.5f}"
+            max_len = max(len(key_str), len(count_str), len(prob_str))
+
+            key_row += f" {key_str.rjust(max_len)} |"
+            count_row += f" {count_str.rjust(max_len)} |"
+            prob_row += f" {prob_str.rjust(max_len)} |"
+
+        parent_attribute = str(self.parent_attribute)
+        parent_attribute_value = str(self.parent_attribute_value)
+        row_len = len(key_row) - 1
+
+        hline = "+" + "-" * row_len + "+"
+        attr_row = parent_attribute + " " * (row_len - len(parent_attribute))
+        attr_val_row = parent_attribute_value + " " * (row_len - len(parent_attribute_value))
+        lines = [
+            hline,
+            "|" + attr_row + "|",
+            "|" + attr_val_row + "|",
+            "|" + "Count &" + " " * (row_len - len("Count &")) + "|",
+            "|" + "Probability" + " " * (row_len - len("Probability")) + "|",
+            hline,
+            "|" + key_row,
+            hline,
+            "|" + count_row,
+            hline,
+            "|" + prob_row,
+            hline
+        ]
+
+        return "\n".join(lines)
+
+
 def main(path: str = "AgaricusLepiota.csv") -> None:
     try:
         data = load_data(path)
