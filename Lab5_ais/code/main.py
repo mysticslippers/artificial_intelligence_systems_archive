@@ -169,6 +169,109 @@ class InformationEntropy:
         return (info_df - self.info_X(df, X_label)) / self.split_info_X(df, X_label)
 
 
+class DecisionTree:
+    def __init__(self, max_leaf_entropy: float = 0.0, max_leaf_samples: int = 1):
+        assert max_leaf_samples > 0, "max_leaf_samples должен быть > 0"
+        self.root: Optional[DecisionTreeNode] = None
+        self.max_leaf_entropy = max_leaf_entropy
+        self.max_leaf_samples = max_leaf_samples
+        self.info_entropy: Optional[InformationEntropy] = None
+
+    def _fill_node_stats(self, node: DecisionTreeNode, df: pd.DataFrame):
+        n = df.shape[0]
+        node.samples_count = n
+
+        samples: Dict[Any, int] = {}
+        probs: Dict[Any, float] = {}
+        max_count = 0
+        best_class = None
+
+        for y_class in self.info_entropy.y_classes:
+            count = df.loc[df[self.info_entropy.y_label] == y_class].shape[0]
+            samples[y_class] = count
+            probs[y_class] = count / n if n > 0 else 0.0
+
+            if count > max_count:
+                max_count = count
+                best_class = y_class
+
+        node.samples = samples
+        node.probability = probs
+        node.prediction = best_class
+        node.entropy = self.info_entropy.info(df)
+
+    def _choose_best_attribute(self, df: pd.DataFrame, available_features: List[str]) -> Optional[str]:
+        best_attr = None
+        best_ratio = -1.0
+        info_df = self.info_entropy.info(df)
+
+        for attr in available_features:
+            ratio = self.info_entropy.gain_ratio_X(df, attr, info_df=info_df)
+            if ratio > best_ratio:
+                best_ratio = ratio
+                best_attr = attr
+        return best_attr
+
+    def _build_tree(self, df: pd.DataFrame, node: DecisionTreeNode, available_features: List[str]):
+        self._fill_node_stats(node, df)
+
+        unique_classes = df[self.info_entropy.y_label].nunique()
+        if (unique_classes == 1 or
+                node.entropy <= self.max_leaf_entropy or
+                node.samples_count <= self.max_leaf_samples or
+                len(available_features) == 0):
+            return
+
+        best_attr = self._choose_best_attribute(df, available_features)
+        if best_attr is None:
+            return
+
+        node.attribute = best_attr
+        remaining_features = [f for f in available_features if f != best_attr]
+
+        for attr_value in self.info_entropy.X_values[best_attr]:
+            subset = df.loc[df[best_attr] == attr_value]
+            if subset.shape[0] == 0:
+                continue
+
+            child = DecisionTreeNode(
+                parent_attribute=best_attr,
+                parent_attribute_value=attr_value
+            )
+            node.children.append(child)
+            self._build_tree(subset, child, remaining_features)
+
+    def fit(self, df: pd.DataFrame, y_label: str) -> "DecisionTree":
+        self.info_entropy = InformationEntropy(df, y_label)
+        feature_cols = [col for col in df.columns if col != y_label]
+
+        self.root = DecisionTreeNode(
+            parent_attribute=None,
+            parent_attribute_value="ROOT"
+        )
+        self._build_tree(df, self.root, feature_cols)
+        return self
+
+    def predict(self, X_test: pd.DataFrame) -> List[Any]:
+        assert self.root is not None, "Сначала вызовите fit()"
+        y_pred: List[Any] = []
+        for i in range(X_test.shape[0]):
+            x = X_test.iloc[i]
+            y_pred.append(self.root.predict(x))
+        return y_pred
+
+    def predict_proba(self, X_test: pd.DataFrame) -> List[Dict[Any, float]]:
+        assert self.root is not None, "Сначала вызовите fit()"
+        y_prob: List[Dict[Any, float]] = []
+        for i in range(X_test.shape[0]):
+            x = X_test.iloc[i]
+            y_prob.append(self.root.predict_proba(x))
+        return y_prob
+
+    def __str__(self) -> str:
+        return str(self.root) if self.root is not None else "<Empty tree>"
+
+
 def main(path: str = "AgaricusLepiota.csv") -> None:
     try:
         data = load_data(path)
