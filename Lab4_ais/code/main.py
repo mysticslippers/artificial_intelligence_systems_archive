@@ -227,3 +227,35 @@ def get_confusion_matrices(k_values: List[int], X_model: pd.DataFrame, y: pd.Ser
         confusion_matrices.append(confusion_matrix)
 
     return confusion_matrices
+
+
+def build_and_evaluate_two_knn_models(data: pd.DataFrame, target_col: str, fixed_features: List[str],
+                                      k_values: List[int], random_state: int = 42) -> Dict[str, List[np.ndarray]]:
+    np.random.seed(random_state)
+
+    y = data[target_col]
+    all_features = [col for col in data.columns if col != target_col]
+
+    missing = [f for f in fixed_features if f not in all_features]
+    if missing:
+        print(f"ВНИМАНИЕ: отсутствуют фиксированные признаки: {missing}")
+        fallback_features = all_features[:len(fixed_features)]
+        print("Использую вместо них признаки:", fallback_features)
+        fixed_features = fallback_features
+
+    X_fixed = data[fixed_features]
+
+    n_features_random = len(fixed_features)
+    random_features = np.random.choice(all_features, size=n_features_random, replace=False)
+    X_random = data[random_features]
+
+    print("Случайно выбранные признаки (Model 1):", list(random_features))
+    print("Фиксированные признаки (Model 2):", fixed_features)
+
+    confusion_random = get_confusion_matrices(k_values, X_random, y, random_state=random_state)
+    confusion_fixed = get_confusion_matrices(k_values, X_fixed, y, random_state=random_state)
+
+    return {
+        "random": confusion_random,
+        "fixed": confusion_fixed
+    }
