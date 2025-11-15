@@ -193,3 +193,37 @@ def knn_predict(X: Union[np.ndarray, pd.DataFrame], y: Union[np.ndarray, pd.Seri
     most_common_label = np.bincount(k_nearest_labels).argmax()
 
     return int(most_common_label)
+
+
+def get_confusion_matrices(k_values: List[int], X_model: pd.DataFrame, y: pd.Series,
+                           test_size: float = 0.2, random_state: int = 42) -> List[np.ndarray]:
+
+    X_train, X_test, y_train, y_test = train_test_split(X_model, y, test_size=test_size,
+                                                        random_state=random_state, stratify=y)
+
+    classes = np.sort(y.unique())
+    classes = [int(c) for c in classes]
+    n_classes = len(classes)
+
+    class_to_index: Dict[int, int] = {
+        cls: idx for idx, cls in enumerate(classes)
+    }
+
+    confusion_matrices: List[np.ndarray] = []
+
+    for k in k_values:
+        y_pred = [
+            knn_predict(X_train.values, y_train.values, x, k)
+            for x in X_test.values
+        ]
+
+        confusion_matrix = np.zeros((n_classes, n_classes), dtype=int)
+
+        for true_label, pred_label in zip(y_test, y_pred):
+            ti = class_to_index[int(true_label)]
+            pi = class_to_index[int(pred_label)]
+            confusion_matrix[ti, pi] += 1
+
+        confusion_matrices.append(confusion_matrix)
+
+    return confusion_matrices
