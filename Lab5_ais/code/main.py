@@ -1,6 +1,18 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Sequence, Hashable
+from collections import namedtuple
+
+from sklearn.model_selection import train_test_split
+
+
 def load_data(path: str) -> pd.DataFrame:
     data = pd.read_csv(path)
     return data
+
 
 def select_random_features(data: pd.DataFrame, y_label: str) -> List[str]:
     feature_cols = [col for col in data.columns if col != y_label]
@@ -310,12 +322,297 @@ class TreePrinter:
         print("\n".join(lines))
 
 
+ConfusionMatrix = namedtuple("ConfusionMatrix", ["TP", "FP", "FN", "TN"])
+
+
+def confusion_matrix(y_true: Sequence[Hashable], y_pred: Sequence[Hashable], positive_label: Optional[Hashable] = None) -> ConfusionMatrix:
+    if not y_true:
+        return ConfusionMatrix(TP=0, FP=0, FN=0, TN=0)
+
+    if positive_label is None:
+        classes = list(set(y_true))
+        positive_label = classes[0]
+
+    TP = FP = FN = TN = 0
+    for yt, yp in zip(y_true, y_pred):
+        if yp == positive_label:
+            if yt == positive_label:
+                TP += 1
+            else:
+                FP += 1
+        else:
+            if yt == positive_label:
+                FN += 1
+            else:
+                TN += 1
+    return ConfusionMatrix(TP=TP, FP=FP, FN=FN, TN=TN)
+
+
+def accuracy_score(y_true: Sequence[Hashable], y_pred: Sequence[Hashable]) -> float:
+    if not y_true:
+        return 0.0
+    correct = sum(1 for yt, yp in zip(y_true, y_pred) if yt == yp)
+    return correct / len(y_true)
+
+
+def precision_score(y_true: Sequence[Hashable], y_pred: Sequence[Hashable], positive_label: Optional[Hashable] = None) -> float:
+    cm = confusion_matrix(y_true, y_pred, positive_label=positive_label)
+    denom = cm.TP + cm.FP
+    return cm.TP / denom if denom > 0 else 0.0
+
+
+def recall_score(y_true: Sequence[Hashable], y_pred: Sequence[Hashable], positive_label: Optional[Hashable] = None) -> float:
+    cm = confusion_matrix(y_true, y_pred, positive_label=positive_label)
+    denom = cm.TP + cm.FN
+    return cm.TP / denom if denom > 0 else 0.0
+
+
+def integrate_traps(x_values, y_values):
+    area = 0.0
+    for i in range(len(x_values) - 1):
+        x0, x1 = x_values[i], x_values[i + 1]
+        y0, y1 = y_values[i], y_values[i + 1]
+        area += (y0 + y1) * (x1 - x0) / 2
+    return area
+
+
+def TPR_by_FPR(y_true: Sequence[Hashable], y_probs: Sequence[Dict[Any, float]],
+               y_positive: Hashable, y_negative: Hashable, lines_count: int = 0):
+    if not y_true:
+        return [0.0], [0.0]
+
+    use_probs = lines_count <= 0
+    probs_pos = [p.get(y_positive, 0.0) for p in y_probs]
+
+    if use_probs:
+        thresholds = sorted(set(probs_pos), reverse=True)
+    else:
+        thresholds = [1 - i / lines_count for i in range(lines_count + 1)]
+
+    FPR_values = [0.0]
+    TPR_values = [0.0]
+
+    for threshold in thresholds:
+        y_pred = [
+            y_positive if p.get(y_positive, 0.0) >= threshold else y_negative
+            for p in y_probs
+        ]
+        cm = confusion_matrix(y_true, y_pred, positive_label=y_positive)
+
+        denom_fpr = cm.FP + cm.TN
+        denom_tpr = cm.TP + cm.FN
+        if denom_fpr == 0 or denom_tpr == 0:
+            continue
+
+        FPR = cm.FP / denom_fpr
+        TPR = cm.TP / denom_tpr
+
+        FPR_values.append(FPR)
+        TPR_values.append(TPR)
+
+    return FPR_values, TPR_values
+
+
+def Precision_by_Recall(y_true: Sequence[Hashable], y_probs: Sequence[Dict[Any, float]],
+                        y_positive: Hashable, y_negative: Hashable, lines_count: int = 0):
+    if not y_true:
+        return [0.0], [1.0]
+
+    use_probs = lines_count <= 0
+    probs_pos = [p.get(y_positive, 0.0) for p in y_probs]
+
+    if use_probs:
+        thresholds = sorted(set(probs_pos), reverse=True)
+    else:
+        thresholds = [1 - i / lines_count for i in range(lines_count + 1)]
+
+    Recall_values = [0.0]
+    Precision_values = [1.0]
+
+    for threshold in thresholds:
+        y_pred = [
+            y_positive if p.get(y_positive, 0.0) >= threshold else y_negative
+            for p in y_probs
+        ]
+        cm = confusion_matrix(y_true, y_pred, positive_label=y_positive)
+
+        denom_recall = cm.TP + cm.FN
+        denom_prec = cm.TP + cm.FP
+        if denom_recall == 0 or denom_prec == 0:
+            continue
+
+        recall = cm.TP / denom_recall
+        precision = cm.TP / denom_prec
+
+        Recall_values.append(recall)
+        Precision_values.append(precision)
+
+    return Recall_values, Precision_values
+
+
+def evaluate_model(model: DecisionTree, X_test: pd.DataFrame, y_test: pd.Series,
+                   positive_label: Optional[Hashable] = None, negative_label: Optional[Hashable] = None,
+                   lines_count: int = 0, plot: bool = True,):
+    y_true = list(y_test)
+    if not y_true:
+        print("Пустая тестовая выборка, метрики не считаются.")
+        return {}
+
+    classes = sorted(set(y_true))
+    if positive_label is None:
+        positive_label = classes[0]
+    if negative_label is None:
+        negative_label = classes[1] if len(classes) > 1 else classes[0]
+
+    y_pred = model.predict(X_test)
+
+    acc = accuracy_score(y_true, y_pred)
+    precision = precision_score(y_true, y_pred, positive_label=positive_label)
+    rec = recall_score(y_true, y_pred, positive_label=positive_label)
+
+    y_probs = model.predict_proba(X_test)
+
+    roc_x, roc_y = TPR_by_FPR(
+        y_true=y_true,
+        y_probs=y_probs,
+        y_positive=positive_label,
+        y_negative=negative_label,
+        lines_count=lines_count,
+    )
+
+    pr_x, pr_y = Precision_by_Recall(
+        y_true=y_true,
+        y_probs=y_probs,
+        y_positive=positive_label,
+        y_negative=negative_label,
+        lines_count=lines_count,
+    )
+
+    roc_pairs = sorted(zip(roc_x, roc_y), key=lambda p: p[0])
+    roc_x, roc_y = zip(*roc_pairs)
+
+    pr_pairs = sorted(zip(pr_x, pr_y), key=lambda p: p[0])
+    pr_x, pr_y = zip(*pr_pairs)
+
+    auc_roc = integrate_traps(list(roc_x), list(roc_y))
+    auc_pr = integrate_traps(list(pr_x), list(pr_y))
+
+    print("=== Оценка модели ===")
+    print(f"Accuracy : {acc:.4f}")
+    print(f"Precision: {precision:.4f} (positive = '{positive_label}')")
+    print(f"Recall   : {rec:.4f} (positive = '{positive_label}')")
+    print()
+    print(f"AUC-ROC  : {auc_roc:.4f}")
+    print(f"AUC-PR   : {auc_pr:.4f}")
+
+    if plot:
+        plt.figure()
+        plt.plot(roc_x, roc_y, marker='s', linestyle='-', markersize=4,
+                 label='ROC')
+        plt.plot([0, 1], [0, 1], linestyle='--', label='Random')
+        plt.xlim(-0.05, 1.05)
+        plt.ylim(-0.05, 1.05)
+        plt.xlabel('False Positive Rate (FPR)')
+        plt.ylabel('True Positive Rate (TPR)')
+        plt.title('ROC-кривая')
+        plt.legend(loc='lower right')
+        plt.grid(True)
+        plt.show()
+
+        plt.figure()
+        plt.plot(pr_x, pr_y, marker='o', linestyle='-', markersize=4,
+                 label='Precision–Recall')
+        plt.xlim(-0.05, 1.05)
+        plt.ylim(-0.05, 1.05)
+        plt.xlabel('Recall (полнота)')
+        plt.ylabel('Precision (точность)')
+        plt.title('Precision–Recall кривая')
+        plt.legend(loc='lower left')
+        plt.grid(True)
+        plt.show()
+
+    return {
+        "accuracy": acc,
+        "precision": precision,
+        "recall": rec,
+        "roc_x": list(roc_x),
+        "roc_y": list(roc_y),
+        "pr_x": list(pr_x),
+        "pr_y": list(pr_y),
+        "auc_roc": auc_roc,
+        "auc_pr": auc_pr,
+    }
+
+
+def count_leaves(node: Optional[DecisionTreeNode]) -> int:
+    if node is None:
+        return 0
+    if not node.children:
+        return 1
+    return sum(count_leaves(child) for child in node.children)
+
+
+def tree_depth(node: Optional[DecisionTreeNode]) -> int:
+    if node is None or not node.children:
+        return 1
+    return 1 + max(tree_depth(child) for child in node.children)
+
+
 def main(path: str = "AgaricusLepiota.csv") -> None:
     try:
         data = load_data(path)
     except FileNotFoundError:
         print(f"Файл '{path}' не найден. Проверь путь к датасету.")
         return
+
+    y_label = "classes"
+
+    print("Размер исходных данных:", data.shape)
+
+    X_labels = select_random_features(data, y_label)
+
+    data_clean = fill_missing_with_mode(data, X_labels, missing_value="?")
+
+    data_n = data_clean[X_labels + [y_label]]
+    print("Размер данных после отбора признаков:", data_n.shape)
+
+    classes = sorted(data_n[y_label].unique())
+    print("Классы целевой переменной:", classes)
+
+    X = data_n.drop(columns=[y_label])
+    y = data_n[y_label]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.9,
+        random_state=0,
+        stratify=y
+    )
+
+    print("Размер train:", X_train.shape[0])
+    print("Размер test :", X_test.shape[0])
+
+    df_train = X_train.join(y_train)
+    dt = DecisionTree(max_leaf_entropy=0.001, max_leaf_samples=10).fit(df_train, y_label)
+
+    print("\n=== Дерево решений (фрагмент) ===")
+    printer = TreePrinter(lambda node: node.children)
+    printer.print(dt.root)
+
+    print("\nДоп. характеристики дерева:")
+    print("Глубина дерева:", tree_depth(dt.root))
+    print("Число листьев:", count_leaves(dt.root))
+
+    evaluate_model(
+        model=dt,
+        X_test=X_test,
+        y_test=y_test,
+        positive_label=classes[0] if len(classes) > 0 else None,
+        negative_label=classes[1] if len(classes) > 1 else None,
+        lines_count=0,
+        plot=True,
+    )
 
 
 if __name__ == "__main__":
