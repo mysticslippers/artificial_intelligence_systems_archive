@@ -272,6 +272,44 @@ class DecisionTree:
         return str(self.root) if self.root is not None else "<Empty tree>"
 
 
+class TreePrinter:
+    def __init__(self, get_children):
+        self.elbow = "└── "
+        self.tee = "├── "
+        self.pipe = "│   "
+        self.blank = "    "
+        self.get_children = get_children
+
+    def _build_lines(self, node, prefix="", is_last=True):
+        if node is None:
+            return []
+
+        block_lines = str(node).strip().split("\n")
+        if not block_lines:
+            return []
+
+        connector = self.elbow if is_last else self.tee
+        lines = [prefix + connector + block_lines[0]]
+
+        child_prefix = prefix + (self.blank if is_last else self.pipe)
+        for line in block_lines[1:]:
+            lines.append(child_prefix + line)
+
+        children = self.get_children(node)
+        for i, child in enumerate(children):
+            last_child = (i == len(children) - 1)
+            lines.extend(self._build_lines(child, child_prefix, last_child))
+
+        return lines
+
+    def print(self, root):
+        if root is None:
+            print("<Empty tree>")
+            return
+        lines = self._build_lines(root, prefix="", is_last=True)
+        print("\n".join(lines))
+
+
 def main(path: str = "AgaricusLepiota.csv") -> None:
     try:
         data = load_data(path)
