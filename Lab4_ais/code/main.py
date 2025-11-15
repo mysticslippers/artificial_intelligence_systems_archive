@@ -152,3 +152,44 @@ def visualize_dataset_statistics(data: pd.DataFrame, target_col: str = "Wine", r
     ax.view_init(elev=-140, azim=60)
 
     plt.show()
+
+
+def knn_predict(X: Union[np.ndarray, pd.DataFrame], y: Union[np.ndarray, pd.Series, list],
+    query_point: Union[np.ndarray, pd.Series, list], k: int = 3) -> int:
+
+    if isinstance(X, pd.DataFrame):
+        X_array = X.values
+    else:
+        X_array = np.asarray(X)
+
+    y_array = np.asarray(y).astype(int)
+
+    query_point = np.asarray(query_point).astype(float).ravel()
+
+    if X_array.shape[1] != query_point.shape[0]:
+        raise ValueError(
+            f"Размерности не совпадают: "
+            f"{X_array.shape[1]} признаков в X и {query_point.shape[0]} в query_point."
+        )
+
+    if k <= 0:
+        raise ValueError("Параметр k должен быть положительным целым числом.")
+
+    if k > len(X_array):
+        raise ValueError(
+            f"k = {k} больше количества образцов в X = {len(X_array)}."
+        )
+
+    diff = X_array - query_point
+
+    sq_distances = np.sum(diff ** 2, axis=1)
+
+    distances = np.sqrt(sq_distances)
+
+    k_indices = np.argsort(distances)[:k]
+
+    k_nearest_labels = y_array[k_indices]
+
+    most_common_label = np.bincount(k_nearest_labels).argmax()
+
+    return int(most_common_label)
