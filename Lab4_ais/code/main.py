@@ -279,10 +279,10 @@ def main(path: str = "WineDataset.csv") -> None:
         print(f"Файл '{path}' не найден. Проверь путь к датасету.")
         return
 
-    print("Первые строки датасета:")
+    print("=== Первые строки датасета ===")
     print(data.head(), "\n")
 
-    print("Статистика по датасету:")
+    print("=== Статистика по датасету ===")
     stats = dataset_statistics(data)
     pd.set_option("display.max_columns", None)
     print(stats, "\n")
