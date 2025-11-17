@@ -245,6 +245,11 @@ def predict_proba_logreg(X: np.ndarray, coeffs: dict) -> np.ndarray:
     return sigmoid(linear_model)
 
 
+def predict_logreg(X: np.ndarray, coeffs: dict, threshold: float = 0.5) -> np.ndarray:
+    proba = predict_proba_logreg(X, coeffs)
+    return (proba >= threshold).astype(int)
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
