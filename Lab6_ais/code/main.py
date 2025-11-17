@@ -201,6 +201,43 @@ def log_loss(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> floa
     return float(loss_value)
 
 
+def train_logistic_regression(X_train: np.ndarray, y_train: np.ndarray,
+                              learning_rate: float = 0.01, n_iterations: int = 1000, print_every: int | None = 100) -> tuple[dict, list[float]]:
+    y = y_train.reshape(-1)
+
+    m, n = X_train.shape
+
+    weights = np.zeros(n)
+    bias = 0.0
+
+    losses: list[float] = []
+
+    for iteration in range(1, n_iterations + 1):
+        linear_model = np.dot(X_train, weights) + bias
+        y_pred = sigmoid(linear_model)
+
+        error = y_pred - y
+        grad_w = (1.0 / m) * np.dot(X_train.T, error)
+        grad_b = (1.0 / m) * np.sum(error)
+
+        weights -= learning_rate * grad_w
+        bias -= learning_rate * grad_b
+
+        if iteration % 100 == 0 or iteration == 1 or iteration == n_iterations:
+            loss = log_loss(y, y_pred)
+            losses.append(loss)
+
+            if print_every is not None and (
+                iteration == 1
+                or iteration == n_iterations
+                or iteration % print_every == 0
+            ):
+                print(f"[GD] Итерация {iteration:4d} | log loss = {loss:.4f}")
+
+    coeffs = {"weights": weights, "bias": bias}
+    return coeffs, losses
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
