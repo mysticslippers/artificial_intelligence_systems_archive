@@ -157,6 +157,35 @@ def visualize_statistics(df: pd.DataFrame,
     plt.show()
 
 
+def split_dataset(df: pd.DataFrame, target_column: str, test_size: float = 0.2, random_state: int = 42):
+    if target_column not in df.columns:
+        raise ValueError(f"Столбец '{target_column}' не найден в датасете.")
+
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y,
+        test_size=test_size,
+        random_state=random_state,
+        stratify=y,
+    )
+
+    print("=== Разделение на обучающую и тестовую выборки ===")
+    print(f"Размер исходного датасета: {len(df)} объектов")
+    print(f"Размер обучающей выборки: {len(X_train)} объектов")
+    print(f"Размер тестовой выборки: {len(X_test)} объектов")
+    print(f"Доля тестовой выборки: {test_size:.2f}\n")
+
+    print("Распределение целевого класса в обучающей выборке:")
+    print(y_train.value_counts(normalize=True).round(3))
+    print("\nРаспределение целевого класса в тестовой выборке:")
+    print(y_test.value_counts(normalize=True).round(3))
+    print()
+
+    return X_train, X_test, y_train, y_test
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
