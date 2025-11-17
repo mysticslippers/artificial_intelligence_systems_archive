@@ -1,3 +1,14 @@
+import math
+from typing import Tuple, List
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib.axes import Axes
+from sklearn.model_selection import train_test_split
+
+
 def load_data(path: str) -> pd.DataFrame:
     data = pd.read_csv(path)
     return data
@@ -455,6 +466,82 @@ def main(path: str = "diabetes.csv") -> None:
     pd.set_option("display.max_columns", None)
     stats = dataset_statistics(processed_data)
     print(stats, "\n")
+
+    print("=== Визуализация статистики ===\n")
+    visualize_statistics(processed_data)
+
+    target_column = "Outcome"
+    X_train_df, X_test_df, y_train_sr, y_test_sr = split_dataset(
+        processed_data,
+        target_column=target_column,
+        test_size=0.2,
+        random_state=42,
+    )
+
+    X_train = X_train_df.values
+    X_test = X_test_df.values
+    y_train = y_train_sr.values
+    y_test = y_test_sr.values
+
+    print("=== Базовая модель логистической регрессии (градиентный спуск) ===")
+    base_lr = 0.01
+    base_iters = 2000
+
+    coeffs_base, losses_base = train_logistic_regression(
+        X_train,
+        y_train,
+        learning_rate=base_lr,
+        n_iterations=base_iters,
+        print_every=500
+    )
+
+    y_test_pred_base = predict_logreg(X_test, coeffs_base, threshold=0.5)
+    base_metrics = calculate_metrics(y_test_pred_base, y_test)
+
+    print(f"\nГиперпараметры базовой модели: learning_rate={base_lr}, iterations={base_iters}")
+    print("=== Метрики базовой модели на тестовой выборке ===")
+    print(f"Accuracy : {base_metrics['accuracy']:.4f}")
+    print(f"Precision: {base_metrics['precision']:.4f}")
+    print(f"Recall   : {base_metrics['recall']:.4f}")
+    print(f"F1-score : {base_metrics['f1_score']:.4f}\n")
+
+    plot_loss_curve(
+        losses_base,
+        title=f"Сходимость базовой модели (GD, lr={base_lr}, iters={base_iters})",
+    )
+
+    print("=== Исследование гиперпараметров логистической регрессии ===")
+    results_df, best_params = explore_hyperparameters(
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        learning_rates=[0.01, 0.2, 0.375, 0.5],
+        iterations=[100, 1000, 5000],
+        threshold=0.5,
+    )
+
+    print("\n=== Лучшая модель по результатам подбора гиперпараметров ===")
+    best_coeffs = best_params["coeffs"]
+    best_losses = best_params.get("losses", [])
+
+    y_test_pred_best = predict_logreg(X_test, best_coeffs, threshold=0.5)
+    best_metrics = calculate_metrics(y_test_pred_best, y_test)
+
+    print("Лучшие гиперпараметры (по F1-score):")
+    print(f"Метод        : {best_params['method']}")
+    print(f"Learning rate: {best_params['learning_rate']}")
+    print(f"Iterations   : {best_params['iterations']}")
+    print("\nМетрики лучшей модели на тестовой выборке:")
+    print(f"Accuracy : {best_metrics['accuracy']:.4f}")
+    print(f"Precision: {best_metrics['precision']:.4f}")
+    print(f"Recall   : {best_metrics['recall']:.4f}")
+    print(f"F1-score : {best_metrics['f1_score']:.4f}")
+
+    plot_loss_curve(
+        best_losses,
+        title=f"Сходимость лучшей модели ({best_params['method']}, iters={best_params['iterations']})",
+    )
 
 
 if __name__ == "__main__":
