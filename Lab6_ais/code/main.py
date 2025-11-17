@@ -326,6 +326,102 @@ def calculate_metrics(y_pred: np.ndarray, y_true: np.ndarray) -> dict[str, float
     }
 
 
+def explore_hyperparameters(X_train: np.ndarray, y_train: np.ndarray, X_test: np.ndarray, y_test: np.ndarray,
+                            learning_rates: list[float] | None = None, iterations: list[int] | None = None, threshold: float = 0.5) -> tuple[pd.DataFrame, dict]:
+    if learning_rates is None:
+        learning_rates = [0.01, 0.1, 0.2, 0.5]
+    if iterations is None:
+        iterations = [100, 500, 1000, 2000]
+
+    results: list[dict] = []
+    best_f1 = -1.0
+    best_params: dict = {}
+
+    for lr in learning_rates:
+        for n_iter in iterations:
+            print(f"\n[GD] learning_rate={lr}, iterations={n_iter}")
+            coeffs, losses = train_logistic_regression(
+                X_train,
+                y_train,
+                learning_rate=lr,
+                n_iterations=n_iter,
+                print_every=None
+            )
+
+            y_pred_test = predict_logreg(X_test, coeffs, threshold=threshold)
+            metrics = calculate_metrics(y_pred_test, y_test)
+
+            loss_improvement = (
+                losses[0] - losses[-1] if len(losses) > 1 else 0.0
+            )
+
+            row = {
+                "method": "gradient_descent",
+                "learning_rate": lr,
+                "iterations": n_iter,
+                "accuracy": metrics["accuracy"],
+                "precision": metrics["precision"],
+                "recall": metrics["recall"],
+                "f1_score": metrics["f1_score"],
+                "loss_improvement": loss_improvement,
+                "losses": losses
+            }
+            results.append(row)
+
+            if metrics["f1_score"] > best_f1:
+                best_f1 = metrics["f1_score"]
+                best_params = row | {"coeffs": coeffs}
+
+    for n_iter in iterations:
+        print(f"\n[Newton] iterations={n_iter}")
+        coeffs_newton, losses_newton = train_logistic_regression_newton(
+            X_train,
+            y_train,
+            n_iterations=n_iter,
+            print_every=None
+        )
+
+        y_pred_test = predict_logreg(X_test, coeffs_newton, threshold=threshold)
+        metrics = calculate_metrics(y_pred_test, y_test)
+
+        loss_improvement = (
+            losses_newton[0] - losses_newton[-1]
+            if len(losses_newton) > 1
+            else 0.0
+        )
+
+        row = {
+            "method": "newton",
+            "learning_rate": None,
+            "iterations": n_iter,
+            "accuracy": metrics["accuracy"],
+            "precision": metrics["precision"],
+            "recall": metrics["recall"],
+            "f1_score": metrics["f1_score"],
+            "loss_improvement": loss_improvement,
+            "losses": losses_newton,
+        }
+        results.append(row)
+
+        if metrics["f1_score"] > best_f1:
+            best_f1 = metrics["f1_score"]
+            best_params = row | {"coeffs": coeffs_newton}
+
+    results_df = pd.DataFrame(results)
+
+    print("\n=== Результаты подбора гиперпараметров ===")
+    print(results_df.drop(columns=["losses"]).to_string(index=False))
+
+    print("\n=== Лучшая комбинация гиперпараметров (по F1-score) ===")
+    best_view = best_params.copy()
+    best_view.pop("coeffs", None)
+    best_view.pop("losses", None)
+    for k, v in best_view.items():
+        print(f"{k:16s}: {v}")
+
+    return results_df, best_params
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
