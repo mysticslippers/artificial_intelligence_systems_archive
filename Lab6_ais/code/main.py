@@ -192,6 +192,15 @@ def sigmoid(z: np.ndarray) -> np.ndarray:
     return 1.0 / (1.0 + np.exp(-z))
 
 
+def log_loss(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-15) -> float:
+    y_pred_clipped = np.clip(y_pred, eps, 1 - eps)
+    loss_value = -np.mean(
+        y_true * np.log(y_pred_clipped) +
+        (1.0 - y_true) * np.log(1.0 - y_pred_clipped)
+    )
+    return float(loss_value)
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
