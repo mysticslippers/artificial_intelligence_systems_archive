@@ -45,6 +45,118 @@ def dataset_statistics(df: pd.DataFrame) -> pd.DataFrame:
     return stats[existing_cols]
 
 
+def _axes_to_list(axes: Axes | np.ndarray) -> List[Axes]:
+    if isinstance(axes, Axes):
+        return [axes]
+    return list(np.array(axes).ravel())
+
+
+def visualize_statistics(df: pd.DataFrame,
+                         corr_figsize: Tuple[int, int] = (15, 10)) -> None:
+    numeric_df = df.select_dtypes(include=[np.number])
+    num_cols = numeric_df.columns.tolist()
+
+    if not num_cols:
+        print("В датасете нет числовых признаков для визуализации.")
+        return
+
+    sns.set_theme(style="whitegrid", palette="pastel", font_scale=1.1)
+
+    means = numeric_df.mean()
+
+    plt.figure(figsize=(18, 6))
+    ax_mean = sns.barplot(x=means.index, y=means.values)
+    ax_mean.set_title("Средние значения (mean) по числовым признакам",
+                      fontsize=16)
+    ax_mean.set_xlabel("Признаки")
+    ax_mean.set_ylabel("Среднее значение")
+
+    for label in ax_mean.get_xticklabels():
+        label.set_rotation(45)
+        label.set_horizontalalignment("right")
+
+    for i, v in enumerate(means.values):
+        ax_mean.text(i, v, f"{v:.2f}",
+                     ha="center", va="bottom", fontsize=9)
+
+    plt.tight_layout()
+    plt.show()
+
+    stds = numeric_df.std()
+
+    plt.figure(figsize=(18, 6))
+    ax_std = sns.barplot(x=stds.index, y=stds.values)
+    ax_std.set_title("Стандартное отклонение (std) по числовым признакам",
+                     fontsize=16)
+    ax_std.set_xlabel("Признаки")
+    ax_std.set_ylabel("Стандартное отклонение")
+
+    for label in ax_std.get_xticklabels():
+        label.set_rotation(45)
+        label.set_horizontalalignment("right")
+
+    for i, v in enumerate(stds.values):
+        ax_std.text(i, v, f"{v:.2f}",
+                    ha="center", va="bottom", fontsize=9)
+
+    plt.tight_layout()
+    plt.show()
+
+    n = len(num_cols)
+    cols = 3
+    rows = int(math.ceil(n / cols))
+
+    fig_hist, axes_hist_raw = plt.subplots(rows, cols, figsize=(18, 4 * rows))
+    axes_hist = _axes_to_list(axes_hist_raw)
+
+    for i, col in enumerate(num_cols):
+        ax = axes_hist[i]
+        sns.histplot(numeric_df[col].dropna(), kde=True, ax=ax)
+        ax.set_title(f"Распределение: {col}", fontsize=12)
+        ax.set_xlabel(col)
+        ax.set_ylabel("Count")
+
+    for extra_ax in axes_hist[i + 1:]:
+        extra_ax.set_visible(False)
+
+    plt.tight_layout()
+    plt.suptitle("Гистограммы распределения признаков",
+                 fontsize=16, y=1.02)
+    plt.show()
+
+    fig_box, axes_box_raw = plt.subplots(rows, cols, figsize=(18, 4 * rows))
+    axes_box = _axes_to_list(axes_box_raw)
+
+    for i, col in enumerate(num_cols):
+        ax = axes_box[i]
+        sns.boxplot(x=numeric_df[col].dropna(), ax=ax)
+        ax.set_title(f"Boxplot: {col}", fontsize=12)
+        ax.set_xlabel(col)
+
+    for extra_ax in axes_box[i + 1:]:
+        extra_ax.set_visible(False)
+
+    plt.tight_layout()
+    plt.suptitle("Boxplot для всех числовых признаков",
+                 fontsize=16, y=1.02)
+    plt.show()
+
+    corr = numeric_df.corr()
+
+    plt.figure(figsize=corr_figsize)
+    sns.heatmap(
+        corr,
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm",
+        center=0,
+        linewidths=0.5,
+    )
+    plt.title("Корреляционная матрица признаков", fontsize=16)
+    plt.tight_layout()
+    plt.show()
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
