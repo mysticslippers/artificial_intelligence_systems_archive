@@ -186,6 +186,12 @@ def split_dataset(df: pd.DataFrame, target_column: str, test_size: float = 0.2, 
     return X_train, X_test, y_train, y_test
 
 
+def sigmoid(z: np.ndarray) -> np.ndarray:
+    z = np.asarray(z, dtype=float)
+    z = np.clip(z, -500, 500)
+    return 1.0 / (1.0 + np.exp(-z))
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
