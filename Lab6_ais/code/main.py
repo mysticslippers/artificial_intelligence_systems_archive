@@ -250,6 +250,54 @@ def predict_logreg(X: np.ndarray, coeffs: dict, threshold: float = 0.5) -> np.nd
     return (proba >= threshold).astype(int)
 
 
+def train_logistic_regression_newton(X_train: np.ndarray, y_train: np.ndarray,
+                                     n_iterations: int = 10, print_every: int | None = 1) -> tuple[dict, list[float]]:
+    y = y_train.reshape(-1)
+    m, n = X_train.shape
+
+    weights = np.zeros(n)
+    bias = 0.0
+    losses: list[float] = []
+
+    eps = 1e-5
+
+    for iteration in range(1, n_iterations + 1):
+        t = X_train @ weights + bias
+        y_pred = sigmoid(t)
+
+        error = y_pred - y
+        grad_w = (1.0 / m) * (X_train.T @ error)
+        grad_b = (1.0 / m) * np.sum(error)
+
+        r = y_pred * (1.0 - y_pred)
+        R = r[:, np.newaxis]
+        H = (1.0 / m) * (X_train.T @ (R * X_train))
+
+        H_reg = H + eps * np.eye(n)
+
+        try:
+            delta_w = np.linalg.solve(H_reg, grad_w)
+        except np.linalg.LinAlgError:
+            print("Предупреждение: матрица Гессе вырождена, останавливаемся.")
+            break
+
+        weights -= delta_w
+        bias -= grad_b
+
+        loss = log_loss(y, y_pred)
+        losses.append(loss)
+
+        if print_every is not None and (
+            iteration == 1
+            or iteration == n_iterations
+            or iteration % print_every == 0
+        ):
+            print(f"[Newton] Итерация {iteration:3d} | log loss = {loss:.4f}")
+
+    coeffs = {"weights": weights, "bias": bias}
+    return coeffs, losses
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
