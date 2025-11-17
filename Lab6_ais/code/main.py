@@ -298,6 +298,34 @@ def train_logistic_regression_newton(X_train: np.ndarray, y_train: np.ndarray,
     return coeffs, losses
 
 
+def calculate_metrics(y_pred: np.ndarray, y_true: np.ndarray) -> dict[str, float]:
+    y_pred = np.asarray(y_pred).reshape(-1)
+    y_true = np.asarray(y_true).reshape(-1)
+
+    TP = np.sum((y_pred == 1) & (y_true == 1))
+    TN = np.sum((y_pred == 0) & (y_true == 0))
+    FP = np.sum((y_pred == 1) & (y_true == 0))
+    FN = np.sum((y_pred == 0) & (y_true == 1))
+
+    total = TP + TN + FP + FN
+
+    accuracy = (TP + TN) / total if total != 0 else 0.0
+    precision = TP / (TP + FP) if (TP + FP) != 0 else 0.0
+    recall = TP / (TP + FN) if (TP + FN) != 0 else 0.0
+    f1_score = (
+        2 * precision * recall / (precision + recall)
+        if (precision + recall) != 0
+        else 0.0
+    )
+
+    return {
+        "accuracy": float(accuracy),
+        "precision": float(precision),
+        "recall": float(recall),
+        "f1_score": float(f1_score),
+    }
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
