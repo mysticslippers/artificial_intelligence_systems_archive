@@ -238,6 +238,13 @@ def train_logistic_regression(X_train: np.ndarray, y_train: np.ndarray,
     return coeffs, losses
 
 
+def predict_proba_logreg(X: np.ndarray, coeffs: dict) -> np.ndarray:
+    w = coeffs["weights"]
+    b = coeffs["bias"]
+    linear_model = np.dot(X, w) + b
+    return sigmoid(linear_model)
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
