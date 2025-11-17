@@ -422,6 +422,21 @@ def explore_hyperparameters(X_train: np.ndarray, y_train: np.ndarray, X_test: np
     return results_df, best_params
 
 
+def plot_loss_curve(losses: list[float], title: str = "Сходимость модели") -> None:
+    if not losses:
+        print("Список losses пуст — нечего рисовать.")
+        return
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(range(1, len(losses) + 1), losses, marker="o")
+    plt.title(title)
+    plt.xlabel("Номер замера (итерации обучения)")
+    plt.ylabel("Log loss")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
 def main(path: str = "diabetes.csv") -> None:
     try:
         data = load_data(path)
